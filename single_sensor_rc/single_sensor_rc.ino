@@ -16,7 +16,7 @@ int detect_value = 0;
 
 void processMotor(void);
 
-const int BASE_L = 105;
+const int BASE_L = 100;
 const int BASE_R = BASE_L + 20;
 
 const int TH_WHITE = 100;
