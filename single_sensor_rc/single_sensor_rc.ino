@@ -16,20 +16,20 @@ int detect_value = 0;
 
 void processMotor(void);
 
-const int BASE_L = 100;
-const int BASE_R = BASE_L + 20;
+const int BASE_LEFT_MOTOR_PWM = 100;
+const int BASE_RIGHT_MOTOR_PWM = BASE_LEFT_MOTOR_PWM + 20;
 
 const int TH_WHITE = 100;
 const int TH_BLACK = 300;
 
-float Kp = 0.45f;
-float Ki = 0.0f;
-float Kd = 2.80f;
+float k_p = 0.45f;
+float k_i = 0.0f;
+float k_d = 2.80f;
 
-float iLimit = 1000.0f;
-int deadband = 6;
+float i_limit = 1000.0f;
+int dead_band = 6;
 
-int steerLimit = 55;
+int steer_limit = 55;
 float d_filt = 0.0f;
 float d_alpha = 0.15f;
 
@@ -102,7 +102,7 @@ void loop() {
 
   float error = (float)(detect_value - REF_VALUE_LINE_DETECT);
 
-  if (error > -deadband && error < deadband) error = 0.0f;
+  if (error > -dead_band && error < dead_band) error = 0.0f;
 
   unsigned long now = millis();
   float dt = (now - prev_ms) / 1000.0f;
@@ -110,19 +110,19 @@ void loop() {
   prev_ms = now;
 
   pid_i += error * dt;
-  pid_i = constrain(pid_i, -iLimit, iLimit);
+  pid_i = constrain(pid_i, -i_limit, i_limit);
 
   float d_raw = (error - prev_error) / dt;
   prev_error = error;
   d_filt = (1.0f - d_alpha) * d_filt + d_alpha * d_raw;
 
-  float steer_f = (Kp * error) + (Ki * pid_i) + (Kd * d_filt);
+  float steer_f = (k_p * error) + (k_i * pid_i) + (k_d * d_filt);
 
-  steer_f = constrain(steer_f, -steerLimit, steerLimit);
+  steer_f = constrain(steer_f, -steer_limit, steer_limit);
   int steer = (int)steer_f;
 
-  int L = BASE_L + steer;
-  int R = BASE_R - steer;
+  int L = BASE_LEFT_MOTOR_PWM + steer;
+  int R = BASE_RIGHT_MOTOR_PWM - steer;
 
   motor_speed_left  = constrain(L, 0, 255);
   motor_speed_right = constrain(R, 0, 255);
